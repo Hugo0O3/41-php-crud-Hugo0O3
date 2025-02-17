@@ -1,66 +1,93 @@
 <?php
 
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', '1');
+ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// open the $_SESSION
+require_once "connexion.php";
 
-// 1. Check all the inputs exist
-// 2. We check also if the $_POST are not empty because we load the page, the form is empty
-if(isset($_POST["..."])
-    && !empty($_POST["..."]) ) {
+if (isset($_POST["submit"])) {
 
-    //Sanitize the inputs
-    $variable = strip_tags($_POST["..."]);
+    if (!empty($_POST["name"])) {
 
-    //SQL part
-    try {
-      require_once "connexion.php";
+        $name = strip_tags($_POST["name"]);
+        $image = null;
 
-      //1. We prepare the request, because we will use user input
-      // By doing that we protect against SQL injection
-      $query = $db->prepare("INSERT INTO ...");
-      
-      //2. To ensure safe and secure database interactions by preventing SQL injection, use bindParam()
-      // bindParam() only accepts a variable that is interpreted at the time of execute()
-      // NB: I prefer bindParam() to bindValue(), because you can define parameter types. 
-      $query->bindParam(":parameter_name", $variable, PDO::PARAM_TYPE);
-      
-      //3. We execute the query. execute() return a boolean
-      // NB: with the code below, we implicitly execute the query
-      if(!$q->execute()) {
-        die("The form was not sent to the db");
-      }
-      
-    } catch (PDOException $e) {
-      // We catch the error from PDO
-      echo $e->getMessage();
-      exit;
+        if (!empty($_FILES["fileToUpload"]["name"])) {
+
+            $target_dir = "uploads/";
+            $file_name = basename($_FILES["fileToUpload"]["name"]);
+            $target_file = $target_dir . $file_name;
+            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+            $uploadOk = 1;
+
+            $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+            if ($check === false) {
+                echo "File is not an image.";
+                $uploadOk = 0;
+            }
+
+            if (file_exists($target_file)) {
+                echo "Désolé, ce fichier existe déjà.";
+                $uploadOk = 0;
+            }
+
+            if ($_FILES["fileToUpload"]["size"] > 20 * 1024 * 1024) {
+                echo "Sorry, your file is too large.";
+                $uploadOk = 0;
+            }
+
+            if (!in_array($imageFileType, ["jpg", "jpeg", "png", "gif"])) {
+                echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+                $uploadOk = 0;
+            }
+
+            if ($uploadOk == 1) {
+                if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+                    echo "The file " . htmlspecialchars($file_name) . " has been uploaded.";
+                    $image = $file_name;
+                } else {
+                    echo "Sorry, there was an error uploading your file.";
+                }
+            }
+        }
+
+        try {
+            global $db;
+            $query = $db->prepare("INSERT INTO pokemonTypes (name, image) VALUES (:name, :image)");
+            $query->bindParam(":name", $name, PDO::PARAM_STR);
+            $query->bindParam(":image", $image, PDO::PARAM_STR);
+
+            if (!$query->execute()) {
+                die("Erreur lors de l'insertion dans la base de données.");
+            }
+
+        } catch (PDOException $e) {
+            echo "Erreur PDO : " . $e->getMessage();
+            exit;
+        }
+        header("location: index.php");
+        exit;
+    } else {
+        echo "Veuillez entrer un nom.";
     }
-      
-    //4. Once is done, redirect to the index.php
-    header("location: index.php");
-    exit;
-
 }
 
-
-// HTML part
 include "includes/header.php";
 
 ?>
 
+    <h1>Ajouter un nouveau type</h1>
 
-<h1>Create</h1>
+    <form method="post" action="" enctype="multipart/form-data">
+        <label for="name">Nom du type :</label>
+        <input type="text" id="name" name="name" required>
 
-    <form method="post" action="">
+        <label for="fileToUpload">Image :</label>
+        <input type="file" id="fileToUpload" name="fileToUpload" accept="image/*">
 
-
+        <button type="submit" name="submit">Ajouter</button>
     </form>
 
-
-
-<?php
-    include "includes/footer.php";
-?>
+<?php include "includes/footer.php"; ?>

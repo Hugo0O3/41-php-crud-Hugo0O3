@@ -12,13 +12,15 @@ require_once "connexion.php";
 
 // Interact with the database
 try {
-  // 1. We can use a direct query, because we admit we will not use data from "outside" (GET or POST)
-  $statement = $db->query("//Your query here");
+    global $db;
+    // 1. We can use a direct query, because we admit we will not use data from "outside" (GET or POST)
+    $statement = $db->query("select * from pokemonTypes");
+    //select * from pokemons
 
 } catch (PDOException $e) {
-  // We catch the error from PDO
-  echo $e->getMessage();
-  exit;
+    // We catch the error from PDO
+    echo $e->getMessage();
+    exit;
 }
 
 // 2. We store the datas from the DB in an Associative Array
@@ -28,27 +30,28 @@ $variable = $statement->fetchAll(PDO::FETCH_ASSOC);
 include "includes/header.php";
 ?>
 
-<!-- The HTML begins here -->
-<main>
-		<h1>CRUD</h1>
-    <ol>
-        <?php
+    <!-- The HTML begins here -->
+    <main>
+        <h1>CRUD</h1>
+        <ol>
+            <?php
             //display the datas
-            foreach() : ?>
+            foreach ($variable as $value) : ?>
 
-            <li>
-                <a href="">
-                    <h3><?= ?></h3>
-                </a>
-            </li>
+                <li>
+                    <a href="single.php?id=<?= $value['id'] ?>">
+                        <h3><?= $value['name'] ?></h3>
+                    </a>
+                </li>
 
-        <?php
+            <?php
             endforeach;
-        ?>
-    </ol>
+            ?>
+        </ol>
+        <a href="create.php">Créér un nouveau type</a>
 
-</main>
+    </main>
 
 <?php
-    include "includes/footer.php";
+include "includes/footer.php";
 ?>
