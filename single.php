@@ -23,7 +23,7 @@ if (isset($_GET['id'])) {
         require_once "connexion.php";
         //1. Prepare the query
         global $db;
-        $statement = $db->prepare("select name, image from pokemonTypes where id = :id");
+        $statement = $db->prepare("select id, name, image from pokemonTypes where id = :id");
 
         //2. BindParam
         $statement->bindParam(':id', $id);
@@ -44,7 +44,6 @@ include "includes/header.php";
 
 ?>
 
-
     <h1>Single post</h1>
 <?php foreach ($variable as $value) : ?>
 
@@ -54,9 +53,10 @@ include "includes/header.php";
             <h3><?= $value['name'] ?></h3>
             <img src="uploads/<?= $value['image'] ?>" alt="<?= $value['image'] ?>" width="250">
             <br>
+            <a href="updateType.php?id=<?= $value['id'] ?>">Modifier ce type</a>
+            <a href="deleteType.php?id=<?= $value['id'] ?>">Supprimer ce type</a>
         </li>
     </ul>
-
 <?php endforeach; ?>
 
 <?php

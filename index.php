@@ -48,7 +48,7 @@ include "includes/header.php";
             endforeach;
             ?>
         </ol>
-        <a href="create.php">Créér un nouveau type</a>
+        <a href="createType.php">Créér un nouveau type</a>
 
     </main>
 
