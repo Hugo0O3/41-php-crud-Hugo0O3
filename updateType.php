@@ -1,5 +1,9 @@
 <?php
 
+require_once 'php/pokemon.php';
+
+use Pokemon\PokemonView;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -70,7 +74,7 @@ if (isset($_POST["submit"])) {
             }
         }
 
-        try {
+        /*try {
             global $db;
             $query = $db->prepare("UPDATE pokemonTypes SET name = :name, image = :image WHERE id = :id");
             $query->bindParam(":name", $newName, PDO::PARAM_STR);
@@ -84,7 +88,11 @@ if (isset($_POST["submit"])) {
         } catch (PDOException $e) {
             echo "PDO Error: " . $e->getMessage();
             exit;
-        }
+        }*/
+
+        $pokemonView = new PokemonView();
+
+        $pokemonView->updateType($newName, $newImage, $errorMessage);
 
         header("Location: index.php");
         exit;

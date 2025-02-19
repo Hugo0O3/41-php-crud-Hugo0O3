@@ -1,5 +1,9 @@
 <?php
 
+require_once 'php/pokemon.php';
+
+use Pokemon\PokemonView;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -53,20 +57,23 @@ if (isset($_POST["submit"])) {
             }
         }
 
-        try {
-            global $db;
-            $query = $db->prepare("INSERT INTO pokemonTypes (name, image) VALUES (:name, :image)");
-            $query->bindParam(":name", $name, PDO::PARAM_STR);
-            $query->bindParam(":image", $image, PDO::PARAM_STR);
+        /* try {
+             global $db;
+             $query = $db->prepare("INSERT INTO pokemonTypes (name, image) VALUES (:name, :image)");
+             $query->bindParam(":name", $name, PDO::PARAM_STR);
+             $query->bindParam(":image", $image, PDO::PARAM_STR);
 
-            if (!$query->execute()) {
-                die("Erreur lors de l'insertion dans la base de données.");
-            }
+             if (!$query->execute()) {
+                 die("Erreur lors de l'insertion dans la base de données.");
+             }
 
-        } catch (PDOException $e) {
-            echo "Erreur PDO : " . $e->getMessage();
-            exit;
-        }
+         } catch (PDOException $e) {
+             echo "Erreur PDO : " . $e->getMessage();
+             exit;
+         }*/
+        $pokemonView = new PokemonView();
+
+        $pokemonView->addType($name, $image, $errorMessage);
         header("location: index.php");
         exit;
     } else {
